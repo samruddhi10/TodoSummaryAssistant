@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-summary
+  labels:
+    app: todo-summary
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: todo-summary
+  template:
+    metadata:
+      labels:
+        app: todo-summary
+    spec:
+      containers:
+      - name: app
+        image: docker.io/samruddhi1003/todo-summary:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: todo-config
+        - secretRef:
+            name: todo-secrets
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
